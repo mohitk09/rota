@@ -1,0 +1,13 @@
+{
+    "name": "rota",
+    "version": "1.0.0",
+    "description": "",
+    "main": "src/ index.js",
+    "author": "",
+    "license": "ISC",
+    "homepage": "https://github.com/mohitk09/rota#readme",
+    "dependencies": {
+        "aws-sdk": "^2.737.0",
+        "eslint": "^7.7.0"
+    }
+}
