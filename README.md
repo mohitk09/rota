@@ -1,4 +1,4 @@
-# rota
+# Rota
 Lists the order in which people will take turns. This project will give all the team members equal 
 responsibility to do a particular job. It can be giving demonstration on sprint retro, taking
 stand up actions, etc. A member will be picked daily so that it is more optimal and less biased
