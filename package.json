@@ -7,7 +7,10 @@
     "license": "ISC",
     "homepage": "https://github.com/mohitk09/rota#readme",
     "dependencies": {
-        "aws-sdk": "^2.737.0",
-        "eslint": "^7.7.0"
+        "aws-sdk": "^2.737.0"
+    },
+    "devDependencies": {
+        "eslint": "^7.7.0",
+        "serverless-pseudo-parameters": "^2.5.0"
     }
 }

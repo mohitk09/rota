@@ -1,0 +1,24 @@
+service:
+  name: rota
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  versionFunctions: false
+  region: ${opt:region}
+  stackTags:
+    tenant: platform
+    feature: rota
+    service: rota
+    owner: Mohit K.
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'logs:*'
+        - 'lambda:InvokeFunction'
+        - 'dynamodb:Query'
+      Resource: '*'
+
+functions:
+  app:
+    handler: src/handler/index.rota
