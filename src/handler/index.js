@@ -1,5 +1,28 @@
 const AWS = require('aws-sdk');
 const dynamodb = new AWS.DynamoDB.DocumentClient();
+const axios = require('axios');
+
+async function getEmployeeDetails(members) {
+    try {
+      const response = await axios({
+        url,
+        method: 'GET',
+        headers : {
+            'accept': "application/json",
+            'authorization': API_KEY
+        },
+      });
+      const absentList = response.data.filter((item) => {
+           return members.includes(item.name);
+      });
+
+      console.log('absenres', absentList);
+      return absentList;
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
 const rota = async(event) => {
     console.log('event', event);
@@ -18,22 +41,26 @@ const rota = async(event) => {
 
    try{
     const { Items } = await dynamodb.query(params).promise();
-    console.log('Items', Items);
     const { members, daysElapsed,teamSize } = Items[0];
-    members.sort((a, b) => b.value - a.value);
+
+    // sorting the members so that minimum credit person is picked first
+    members.sort((a, b) => {
+        if(a.credits === b.credits) return a.lastDone-b.lastDone;
+        return a.credits-b.credits;
+    });
+    const memberNames = members.map((item) =>  item.name);
+    const absentList  = await getEmployeeDetails(memberNames);
+    console.log('memmbes', members);
+    var today = new Date();
+    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+
+
+    console.log('todat', date);
+
     for(let i=0;i<members.length;i++){
         //check availability of member here and also decrement the count of the selected member
-    }
-    /* doing this so that every person does it for atleast a week and after these number of 
-    days the system will increment the number of days
-    */
-    const updateDays = (daysElapsed+1)%(teamSize*5);
-
-    if(!daysElapsed){
-        // increment here count of every member by 5
-
-    }
-    console.log('members', members);    
+        
+    }  
     return null;
    }catch(error){
        console.log('In catch', error);
@@ -46,9 +73,3 @@ rota({
     stage: 'test'
 });
 module.exports = { rota };
-
-
-
-
-
-
