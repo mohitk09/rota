@@ -2,6 +2,8 @@ const AWS = require('aws-sdk');
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 const axios = require('axios');
 
+const url = 'https://api.bamboohr.com/api/gateway.php/peak/v1/time_off/whos_out/';
+
 async function getEmployeeDetails(members) {
     try {
       const response = await axios({
@@ -9,18 +11,28 @@ async function getEmployeeDetails(members) {
         method: 'GET',
         headers : {
             'accept': "application/json",
-            'authorization': API_KEY
+            'authorization': process.env.API_KEY
         },
       });
-      const absentList = response.data.filter((item) => {
+      const absentiesList = response.data.filter((item) => {
            return members.includes(item.name);
       });
 
-      console.log('absenres', absentList);
-      return absentList;
-
+      const today = new Date();
+      const todayDate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+      const absentToday = absentiesList.filter((item) =>{
+          const start = new Date(item.start);
+          const startDate = start.getFullYear()+'-'+(start.getMonth()+1)+'-'+start.getDate();
+          const end = new Date(item.end);
+          const endDate = end.getFullYear()+'-'+(end.getMonth()+1)+'-'+end.getDate();
+          if(todayDate >= startDate  && todayDate <= endDate){
+              return item;
+          }
+      });
+      return absentToday;
     } catch (error) {
       console.error(error);
+      return null;
     }
   }
 
@@ -49,13 +61,9 @@ const rota = async(event) => {
         return a.credits-b.credits;
     });
     const memberNames = members.map((item) =>  item.name);
-    const absentList  = await getEmployeeDetails(memberNames);
+    const absentiesList  = await getEmployeeDetails(memberNames);
     console.log('memmbes', members);
-    var today = new Date();
-    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-
-
-    console.log('todat', date);
+    
 
     for(let i=0;i<members.length;i++){
         //check availability of member here and also decrement the count of the selected member
