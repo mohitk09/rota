@@ -38,6 +38,7 @@ async function getEmployeeDetails(members) {
 
 const rota = async(event) => {
     const { teamName, stage } = event;
+    console.log('event', event);
 
     const params = {
         TableName: `ais-${stage}-rota`,
@@ -103,8 +104,4 @@ const rota = async(event) => {
    }
 };
 
-rota({
-    teamName: 'devops',
-    stage: 'test'
-});
 module.exports = { rota };
