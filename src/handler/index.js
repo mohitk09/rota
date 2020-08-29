@@ -4,10 +4,11 @@ const secretsmanager = new AWS.SecretsManager();
 const axios = require('axios');
 
 async function getEmployeeDetails(members) {
-  
-  const  { SecretString } = await secretsmanager.getSecretValue({ SecretId: 'Bamboo' }).promise();
-  const { API_KEY } = JSON.parse(SecretString);
   try {
+
+    const  { SecretString } = await secretsmanager.getSecretValue({ SecretId: 'Bamboo' }).promise();
+    const { API_KEY } = JSON.parse(SecretString);
+
     const response = await axios({
       url : 'https://api.bamboohr.com/api/gateway.php/peak/v1/time_off/whos_out/',
       method: 'GET',
@@ -16,10 +17,9 @@ async function getEmployeeDetails(members) {
           'authorization': API_KEY
       },
     });
-    const absentiesList = response.data.filter((item) => {
+    const absentiesList = (response.data || []).filter((item) => {
           return members.includes(item.name);
     });
-
     const today = new Date();
     const todayDate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
     const absentToday = absentiesList.filter((item) =>{
@@ -27,19 +27,16 @@ async function getEmployeeDetails(members) {
         const startDate = start.getFullYear()+'-'+(start.getMonth()+1)+'-'+start.getDate();
         const end = new Date(item.end);
         const endDate = end.getFullYear()+'-'+(end.getMonth()+1)+'-'+end.getDate();
-        if(todayDate >= startDate  && todayDate <= endDate){
-            return item;
-        }
-    });
+        if(todayDate >= startDate  && todayDate <= endDate) return item;
+    }).map(({ name }) =>  name);
     return absentToday;
   } catch (error) {
     console.error(error);
-    return null;
+    throw error;
   }
 }
 
 const rota = async(event) => {
-    console.log('event', event);
     const { teamName, stage } = event;
 
     const params = {
@@ -55,7 +52,7 @@ const rota = async(event) => {
 
    try{
     const { Items } = await dynamodb.query(params).promise();
-    const { members, daysElapsed,teamSize } = Items[0];
+    const { members, daysElapsed } = Items[0];
 
     // sorting the members so that minimum credit person is picked first
     members.sort((a, b) => {
@@ -66,14 +63,42 @@ const rota = async(event) => {
     const absentiesList  = await getEmployeeDetails(memberNames);
     console.log('memmbes', members);
     
-
+    //check availability of member here and also decrement the count of the selected member
+    let personSelected = members[0].name;
     for(let i=0;i<members.length;i++){
-        //check availability of member here and also decrement the count of the selected member
-        
-    }  
+      if(!absentiesList.includes(members[i].name)){
+        personSelected = members[i].name;
+        break;
+      }
+    }
+    
+    members.forEach((item) =>{
+      if(item.name === personSelected){
+        item.credits += 1;
+        item.lastDone = new Date().valueOf();
+      }
+    });
+    const updateParams =  {
+      ExpressionAttributeNames: {
+       "#members": "members", 
+       "#daysElapsed": "daysElapsed",
+      }, 
+      ExpressionAttributeValues: {
+       ':members': members,
+       ':daysElapsed': daysElapsed+1,
+      }, 
+      Key: {
+        'teamName': teamName
+      },
+      ReturnValues: 'ALL_NEW', 
+      TableName: `ais-${stage}-rota`, 
+      UpdateExpression: "SET #members = :members, #daysElapsed = :daysElapsed"
+     };
+
+    await dynamodb.update(updateParams).promise();
     return null;
    }catch(error){
-       console.log('In catch', error);
+       console.log(error);
        return null;
    }
 };
