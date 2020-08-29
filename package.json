@@ -6,6 +6,9 @@
     "author": "",
     "license": "ISC",
     "homepage": "https://github.com/mohitk09/rota#readme",
+    "scripts": {
+        "lint": "eslint src"
+    },
     "dependencies": {
         "axios": "^0.20.0"
     },
