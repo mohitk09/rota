@@ -10,7 +10,8 @@
         "lint": "eslint src"
     },
     "dependencies": {
-        "axios": "^0.20.0"
+        "axios": "^0.20.0",
+        "slack-notify": "^0.1.7"
     },
     "devDependencies": {
         "aws-sdk": "^2.738.0",
