@@ -67,9 +67,11 @@ const rota = async(event) => {
     
     //check availability of member here and also decrement the count of the selected member
     let personSelected = members[0].name;
+    let personCredits = members[0].credits;
     for(let i=0;i<members.length;i++){
       if(!absentiesList.includes(members[i].name)){
         personSelected = members[i].name;
+        personCredits = members[i].credits;
         break;
       }
     }
@@ -98,7 +100,7 @@ const rota = async(event) => {
      };
 
     await dynamodb.update(updateParams).promise();
-    await sendSlackNotifications(personSelected);
+    await sendSlackNotifications(personSelected, personCredits);
     return null;
    }catch(error){
        console.log(error);
