@@ -39,6 +39,7 @@ async function getEmployeeDetails(members) {
 const rota = async(event) => {
     const { teamName, stage } = event;
     console.log('event', event);
+    console.log('prcess.enb ', process.env);
 
     const params = {
         TableName: `ais-${stage}-rota`,

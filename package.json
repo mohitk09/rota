@@ -2,7 +2,7 @@
     "name": "rota",
     "version": "1.0.0",
     "description": "",
-    "main": "src/ index.js",
+    "main": "src/handler/index.js",
     "author": "",
     "license": "ISC",
     "homepage": "https://github.com/mohitk09/rota#readme",

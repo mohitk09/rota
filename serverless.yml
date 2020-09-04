@@ -11,6 +11,9 @@ provider:
     feature: rota
     service: rota
     owner: Mohit K.
+  environment:
+    WEBHOOK_URL: ${file(./env.yml):WEBHOOK_URL}
+    ACCOUNT_ID: !Ref AWS::AccountId
   iamRoleStatements:
     - Effect: 'Allow'
       Action:
