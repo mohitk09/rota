@@ -2,6 +2,7 @@ const AWS = require('aws-sdk');
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 const secretsmanager = new AWS.SecretsManager();
 const axios = require('axios');
+const { sendSlackNotifications } = require('./notify-slack');
 
 async function getEmployeeDetails(members) {
   try {
@@ -39,7 +40,6 @@ async function getEmployeeDetails(members) {
 const rota = async(event) => {
     const { teamName, stage } = event;
     console.log('event', event);
-    console.log('prcess.enb ', process.env);
 
     const params = {
         TableName: `ais-${stage}-rota`,
@@ -98,11 +98,14 @@ const rota = async(event) => {
      };
 
     await dynamodb.update(updateParams).promise();
+    await sendSlackNotifications(personSelected);
     return null;
    }catch(error){
        console.log(error);
        return null;
    }
 };
+
+rota({teamName: "devops", stage: "test"});
 
 module.exports = { rota };
