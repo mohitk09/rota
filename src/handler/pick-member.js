@@ -52,7 +52,7 @@ const pickMember = async(event) => {
         },
       };
 
-   try{
+    try{
     const { Items } = await dynamodb.query(params).promise();
     const { members, daysElapsed } = Items[0];
 
@@ -84,12 +84,12 @@ const pickMember = async(event) => {
     });
     const updateParams =  {
       ExpressionAttributeNames: {
-       "#members": "members", 
-       "#daysElapsed": "daysElapsed",
+      "#members": "members", 
+      "#daysElapsed": "daysElapsed",
       }, 
       ExpressionAttributeValues: {
-       ':members': members,
-       ':daysElapsed': daysElapsed+1,
+      ':members': members,
+      ':daysElapsed': daysElapsed+1,
       }, 
       Key: {
         'teamName': teamName
@@ -97,15 +97,15 @@ const pickMember = async(event) => {
       ReturnValues: 'ALL_NEW', 
       TableName: `ais-${stage}-rota`, 
       UpdateExpression: "SET #members = :members, #daysElapsed = :daysElapsed"
-     };
+    };
 
     await dynamodb.update(updateParams).promise();
     await sendSlackNotifications(personSelected, personCredits);
     return null;
-   }catch(error){
-       console.log(error);
-       return null;
-   }
+  }catch(error){
+      console.log(error);
+      return null;
+  }
 };
 
 // rota({teamName: "devops", stage: "test"});
