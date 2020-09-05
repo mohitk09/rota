@@ -25,11 +25,13 @@ provider:
       Resource: '*'
 
 functions:
-  app:
-    handler: src/handler/index.rota
+  pickMember:
+    handler: src/handler/pick-member.pickMember
     events:
       - schedule: 
         rate: cron(0 8 ? * MON-FRI *)
         input:
           teamName: devops
           stage: test
+  markUnavailable:
+    handler: src/handler/mark-unavailable.markUnavailable

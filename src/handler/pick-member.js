@@ -37,7 +37,7 @@ async function getEmployeeDetails(members) {
   }
 }
 
-const rota = async(event) => {
+const pickMember = async(event) => {
     const { teamName, stage } = event;
     console.log('event', event);
 
@@ -108,6 +108,6 @@ const rota = async(event) => {
    }
 };
 
-rota({teamName: "devops", stage: "test"});
+// rota({teamName: "devops", stage: "test"});
 
-module.exports = { rota };
+module.exports = { pickMember };
