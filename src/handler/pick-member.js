@@ -38,7 +38,8 @@ async function getEmployeeDetails(members) {
 }
 
 const pickMember = async(event) => {
-    const { teamName, stage } = event;
+    const { stage } = process.env;
+    const { teamName } = event;
     console.log('event', event);
 
     const params = {

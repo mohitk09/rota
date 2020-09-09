@@ -15,6 +15,7 @@ provider:
     WEBHOOK_URL: ${file(./env.yml):WEBHOOK_URL}
     ACCOUNT_ID: !Ref AWS::AccountId
     CHANNEL_NAME: ${file(./env.yml):CHANNEL_NAME}
+    stage: ${opt:stage}
   iamRoleStatements:
     - Effect: 'Allow'
       Action:
@@ -33,6 +34,5 @@ functions:
           enabled: false
           input:
             teamName: devops
-            stage: test
   markUnavailable:
     handler: src/handler/mark-unavailable.markUnavailable
