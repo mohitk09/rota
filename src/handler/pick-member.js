@@ -58,7 +58,7 @@ const pickMember = async(event) => {
 
     // sorting the members so that minimum credit person is picked first
     members.sort((a, b) => {
-        if(a.credits === b.credits) return a.lastDone-b.lastDone;
+        if(a.credits === b.credits) return a.current-b.current;
         return a.credits-b.credits;
     });
     const memberNames = members.map((item) =>  item.name);
@@ -79,7 +79,8 @@ const pickMember = async(event) => {
     members.forEach((item) =>{
       if(item.name === personSelected){
         item.credits += 1;
-        item.lastDone = new Date().valueOf();
+        item.previous = item.current;
+        item.current = new Date().valueOf();
       }
     });
     const updateParams =  {
