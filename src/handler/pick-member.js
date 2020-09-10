@@ -39,7 +39,50 @@ async function getEmployeeDetails(members) {
 
 const pickMember = async(event) => {
     const { stage } = process.env;
-    const { teamName, source } = event;
+    const { teamName, source, name } = event;
+    let peopleUnavailable = [];
+    try{
+    if(!source){
+      const updateParams =  {
+        ExpressionAttributeNames: {
+        "#peopleUnavailable": "peopleUnavailable",
+        }, 
+        ExpressionAttributeValues: {
+        ':peopleUnavailable': [name],
+        ':empty_list': []
+        }, 
+        Key: {
+          'teamName': teamName
+        },
+        ReturnValues: 'ALL_NEW', 
+        TableName: `ais-${stage}-rota`, 
+        UpdateExpression: "SET #peopleUnavailable = list_append(if_not_exists(#peopleUnavailable, :empty_list), :peopleUnavailable)"
+      };
+      const response = await dynamodb.update(updateParams).promise();
+      peopleUnavailable = response.Attributes.peopleUnavailable; 
+      console.log('resp1 ---- ', response);
+      console.log('people un--', peopleUnavailable); 
+
+      return null;
+
+    }else{
+      const updateParams =  {
+        ExpressionAttributeNames: {
+        "#peopleUnavailable": "peopleUnavailable",
+        }, 
+        ExpressionAttributeValues: {
+        ':peopleUnavailable': [],
+        }, 
+        Key: {
+          'teamName': teamName
+        },
+        ReturnValues: 'ALL_NEW', 
+        TableName: `ais-${stage}-rota`, 
+        UpdateExpression: "SET #peopleUnavailable = :peopleUnavailable"
+      };
+      await dynamodb.update(updateParams).promise();
+
+    }
     console.log('event', event);
 
     const params = {
@@ -53,7 +96,6 @@ const pickMember = async(event) => {
         },
       };
 
-    try{
     const { Items } = await dynamodb.query(params).promise();
     const { members, daysElapsed } = Items[0];
 
@@ -70,7 +112,7 @@ const pickMember = async(event) => {
     let personSelected = members[0].name;
     let personCredits = members[0].credits;
     for(let i=0;i<members.length;i++){
-      if(!absentiesList.includes(members[i].name)){
+      if(!absentiesList.includes(members[i].name) && !peopleUnavailable.includes(members[i].name)){
         personSelected = members[i].name;
         personCredits = members[i].credits;
         break;

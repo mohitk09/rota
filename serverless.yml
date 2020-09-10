@@ -16,7 +16,7 @@ provider:
     ACCOUNT_ID: !Ref AWS::AccountId
     CHANNEL_NAME: ${file(./env.yml):CHANNEL_NAME}
     stage: ${opt:stage}
-    region: ${opt:stage}
+    region: ${opt:region}
   iamRoleStatements:
     - Effect: 'Allow'
       Action:
