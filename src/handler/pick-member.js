@@ -39,7 +39,7 @@ async function getEmployeeDetails(members) {
 
 const pickMember = async(event) => {
     const { stage } = process.env;
-    const { teamName } = event;
+    const { teamName, source } = event;
     console.log('event', event);
 
     const params = {
@@ -103,6 +103,7 @@ const pickMember = async(event) => {
 
     await dynamodb.update(updateParams).promise();
     await sendSlackNotifications(personSelected, personCredits);
+    console.log('Engineer for today is', personSelected);
     return null;
   }catch(error){
       console.log(error);

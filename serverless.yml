@@ -16,6 +16,7 @@ provider:
     ACCOUNT_ID: !Ref AWS::AccountId
     CHANNEL_NAME: ${file(./env.yml):CHANNEL_NAME}
     stage: ${opt:stage}
+    region: ${opt:stage}
   iamRoleStatements:
     - Effect: 'Allow'
       Action:
@@ -34,5 +35,6 @@ functions:
           enabled: false
           input:
             teamName: devops
+            source: cloudwatch
   markUnavailable:
     handler: src/handler/mark-unavailable.markUnavailable
