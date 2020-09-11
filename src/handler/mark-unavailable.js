@@ -4,7 +4,7 @@ const markUnavailable = async(event) => {
     console.log('event', event);
     const { stage, region } = process.env;
     const lambda = new AWS.Lambda({ region });
-    const response =  lambda.invokeAsync({
+    const response =  await lambda.invoke({
         FunctionName:  `rota-${stage}-pickMember`,
         Payload: JSON.stringify(event) 
     }).promise();
