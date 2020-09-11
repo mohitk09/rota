@@ -42,21 +42,44 @@ const pickMember = async(event) => {
     const { teamName, source, name } = event;
     let peopleUnavailable = [];
     try{
+      const params = {
+        TableName: `ais-${stage}-rota`,
+        KeyConditionExpression: '#teamName = :teamName',
+        ExpressionAttributeNames: {
+          '#teamName': 'teamName',
+        },
+        ExpressionAttributeValues: {
+          ':teamName': teamName,
+        },
+      };
+
+    const { Items } = await dynamodb.query(params).promise();
+    const { members, daysElapsed } = Items[0];
+
     if(!source){
+      members.forEach((item) =>{
+        if(item.name === name){
+          item.credits -= 1;
+          item.current = item.previous;
+        }
+      });
+
       const updateParams =  {
         ExpressionAttributeNames: {
+        "#members": "members", 
         "#peopleUnavailable": "peopleUnavailable",
         }, 
         ExpressionAttributeValues: {
         ':peopleUnavailable': [name],
-        ':empty_list': []
+        ':empty_list': [],
+        ':members': members
         }, 
         Key: {
           'teamName': teamName
         },
         ReturnValues: 'ALL_NEW', 
         TableName: `ais-${stage}-rota`, 
-        UpdateExpression: "SET #peopleUnavailable = list_append(if_not_exists(#peopleUnavailable, :empty_list), :peopleUnavailable)"
+        UpdateExpression: "SET #peopleUnavailable = list_append(if_not_exists(#peopleUnavailable, :empty_list), :peopleUnavailable), #members = :members"
       };
       const response = await dynamodb.update(updateParams).promise();
       peopleUnavailable = response.Attributes.peopleUnavailable; 
@@ -83,21 +106,6 @@ const pickMember = async(event) => {
       await dynamodb.update(updateParams).promise();
 
     }
-    console.log('event', event);
-
-    const params = {
-        TableName: `ais-${stage}-rota`,
-        KeyConditionExpression: '#teamName = :teamName',
-        ExpressionAttributeNames: {
-          '#teamName': 'teamName',
-        },
-        ExpressionAttributeValues: {
-          ':teamName': teamName,
-        },
-      };
-
-    const { Items } = await dynamodb.query(params).promise();
-    const { members, daysElapsed } = Items[0];
 
     // sorting the members so that minimum credit person is picked first
     members.sort((a, b) => {
