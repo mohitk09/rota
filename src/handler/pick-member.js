@@ -86,8 +86,6 @@ const pickMember = async(event) => {
       console.log('resp1 ---- ', response);
       console.log('people un--', peopleUnavailable); 
 
-      return null;
-
     }else{
       const updateParams =  {
         ExpressionAttributeNames: {
