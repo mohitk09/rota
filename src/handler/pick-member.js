@@ -78,7 +78,11 @@ const pickMember = async(event) => {
         return a.credits-b.credits;
     });
     const memberNames = members.map((item) =>  item.name);
-    const absentiesList  = await getEmployeeDetails(memberNames);
+
+    let absentiesList = [];
+    if(source)
+      absentiesList  = await getEmployeeDetails(memberNames);
+
     console.log('memmbes', members);
     
     //check availability of member here and also decrement the count of the selected member
@@ -103,17 +107,19 @@ const pickMember = async(event) => {
       ExpressionAttributeNames: {
       "#members": "members", 
       "#daysElapsed": "daysElapsed",
+      "#peopleUnavailable": "peopleUnavailable"
       }, 
       ExpressionAttributeValues: {
       ':members': members,
       ':daysElapsed': daysElapsed+1,
+      ':peopleUnavailable': absentiesList
       }, 
       Key: {
         'teamName': teamName
       },
       ReturnValues: 'ALL_NEW', 
       TableName: `ais-${stage}-rota`, 
-      UpdateExpression: "SET #members = :members, #daysElapsed = :daysElapsed"
+      UpdateExpression: "SET #members = :members, #daysElapsed = :daysElapsed, #peopleUnavailable = :peopleUnavailable"
     };
 
     await dynamodb.update(updateParams).promise();

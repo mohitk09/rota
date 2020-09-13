@@ -36,5 +36,3 @@ functions:
           input:
             teamName: devops
             source: cloudwatch
-  markUnavailable:
-    handler: src/handler/mark-unavailable.markUnavailable
