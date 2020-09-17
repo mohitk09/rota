@@ -40,3 +40,4 @@ Bamboo so if a person is absent, he shall be marked unavailable through slack ch
 1. [Information about using the BambooHR API](https://documentation.bamboohr.com/reference)
 2. [Javascript SDK]()
 3. [AWS Chatbot](https://aws.amazon.com/blogs/devops/running-aws-commands-from-slack-using-aws-chatbot/)
+4. [Slack Webhook](https://api.slack.com/messaging/webhooks)
