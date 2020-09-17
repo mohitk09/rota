@@ -27,3 +27,8 @@ like this.
 Bamboo so if a person is absent, he shall be marked unavailable through slack channel only.
 2. Some national holidays are also not stored in bamboo so people picked on that day would have the extra credit.
 3. [individual auth tokens only](https://documentation.bamboohr.com/docs#section-authentication) - BambooHR doesn't allow you to create system users to use a set api key, it must be authenticated and permissioned as if it were a real user of the software.
+
+## References 
+1. [Information about using the BambooHR API](https://documentation.bamboohr.com/reference)
+2. [Javascript SDK]()
+3. 
