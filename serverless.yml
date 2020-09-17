@@ -13,7 +13,6 @@ provider:
     owner: Mohit K.
   environment:
     WEBHOOK_URL: ${file(./env.yml):WEBHOOK_URL}
-    ACCOUNT_ID: !Ref AWS::AccountId
     CHANNEL_NAME: ${file(./env.yml):CHANNEL_NAME}
     stage: ${opt:stage}
     region: ${opt:region}
