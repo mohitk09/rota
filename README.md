@@ -22,7 +22,8 @@ like this.
 
 ![logo](slack-invoke.png)
 
-## Gotcha's
-1. This project does not take care the flexible holidays as they are not recorded in 
+## Gotchas
+1. This project does not take care the account of flexible holidays as they are not recorded in 
 Bamboo so if a person is absent, he shall be marked unavailable through slack channel only.
 2. Some national holidays are also not stored in bamboo so people picked on that day would have the extra credit.
+3. [individual auth tokens only](https://documentation.bamboohr.com/docs#section-authentication) - BambooHR doesn't allow you to create system users to use a set api key, it must be authenticated and permissioned as if it were a real user of the software.
