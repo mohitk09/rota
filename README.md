@@ -22,6 +22,14 @@ like this.
 
 ![logo](slack-invoke.png)
 
+## Running the service
+1. Deploy the clouformation stack `resources.yml`, it creates the dynamoDB table.
+2. Deploy serverless project, it deploys the lambda and the cloudwatch event rule.
+3. Slack Webhook should be created so that updates are posted on slack channel.
+4. Configure AWS chatbot to invoke lambda function from the slack channel.
+5. Store the bamboo secret in secrets manager.
+6. Now the script would run according to the cron specified in the serverless project.
+
 ## Gotchas
 1. This project does not take care the account of flexible holidays as they are not recorded in 
 Bamboo so if a person is absent, he shall be marked unavailable through slack channel only.
