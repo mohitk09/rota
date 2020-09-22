@@ -122,8 +122,8 @@ const pickMember = async(event) => {
       UpdateExpression: "SET #members = :members, #daysElapsed = :daysElapsed, #peopleUnavailable = :peopleUnavailable"
     };
 
-    await dynamodb.update(updateParams).promise();
-    await sendSlackNotifications(personSelected, personCredits);
+    await Promise.all([dynamodb.update(updateParams).promise(),
+      sendSlackNotifications(personSelected, personCredits) ]);
     console.log('Engineer for today is', personSelected);
     return null;
   }catch(error){
