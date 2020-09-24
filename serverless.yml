@@ -32,7 +32,7 @@ functions:
     events:
       - schedule:
           rate: cron(0 7 ? * MON-FRI *)
-          enabled: false
+          enabled: true
           input:
             teamName: devops
             source: cloudwatch
