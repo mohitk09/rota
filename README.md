@@ -1,5 +1,8 @@
 # Rota
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+
 ## Description
 
 Lists the order in which people will take turns. This project will give all the team members equal 
