@@ -16,58 +16,65 @@ async function UnavailableForMostOfTheWeek(members) {
     absentiesList.forEach(item => {
       const startDate = new Date(item.start);
       const endDate = new Date(item.end);
-      let todayDate = new Date();
-      todayDate =
+      const todayDate = new Date();
+      const formattedTodayDate =
         todayDate.getFullYear() +
         "-" +
         (todayDate.getMonth() + 1) +
         "-" +
         todayDate.getDate();
-      let endDateOfTheWeek = addDays(todayDate, 4);
-      endDateOfTheWeek =
+      const endDateOfTheWeek = addDays(todayDate, 3);
+      const formattedEndDateOfTheWeek =
         endDateOfTheWeek.getFullYear() +
         "-" +
         (endDateOfTheWeek.getMonth() + 1) +
         "-" +
         endDateOfTheWeek.getDate();
-      if (startDate <= endDateOfTheWeek) {
-        if (endDate >= endDateOfTheWeek) {
+      console.log(item);
+      if (item.start <= formattedEndDateOfTheWeek) {
+        if (item.end >= formattedEndDateOfTheWeek) {
           const timeDiffWrtWeek =
             endDateOfTheWeek.getTime() - startDate.getTime();
-          const daysDiffWrtWeek = timeDiffWrtWeek / (1000 * 3600 * 24) + 1;
+          const daysDiffWrtWeek = Math.floor(
+            timeDiffWrtWeek / (1000 * 3600 * 24) + 1
+          );
           if (membersUnavailability.has(item.name)) {
-            const value = membersUnavailability.get(item.name);
-            membersUnavailability.set(value + daysDiffWrtWeek);
+            membersUnavailability.set(
+              item.name,
+              membersUnavailability.get(item.name) + daysDiffWrtWeek
+            );
           } else {
-            membersUnavailability.set(daysDiffWrtWeek);
+            membersUnavailability.set(item.name, daysDiffWrtWeek);
           }
         } else {
-          if (todayDate >= startDate) {
+          if (formattedTodayDate >= item.start) {
             const timeDiffWrtStartDate =
               endDate.getTime() - todayDate.getTime();
             const dayDiffWrtStartDate =
               timeDiffWrtStartDate / (1000 * 3600 * 24) + 1;
             if (membersUnavailability.has(item.name)) {
               const value = membersUnavailability.get(item.name);
-              membersUnavailability.set(value + dayDiffWrtStartDate);
+              membersUnavailability.set(item.name, value + dayDiffWrtStartDate);
             } else {
-              membersUnavailability.set(dayDiffWrtStartDate);
+              membersUnavailability.set(item.name, dayDiffWrtStartDate);
             }
           } else {
             const timeDiffWrtEnd = endDate.getTime() - startDate.getTime();
             const daysDiffWrtEnd = timeDiffWrtEnd / (1000 * 3600 * 24) + 1;
             if (membersUnavailability.has(item.name)) {
               const value = membersUnavailability.get(item.name);
-              membersUnavailability.set(value + daysDiffWrtEnd);
+              membersUnavailability.set(item.name, value + daysDiffWrtEnd);
             } else {
-              membersUnavailability.set(daysDiffWrtEnd);
+              membersUnavailability.set(item.name, daysDiffWrtEnd);
             }
           }
         }
       }
-
-      console.log(endDateOfTheWeek);
     });
+
+    for (let [key, value] of membersUnavailability.entries()) {
+      console.log(key + " = " + value);
+    }
   } catch (error) {
     console.error(error);
     throw error;
@@ -143,7 +150,7 @@ const members = [
 
 function addDays(date, days) {
   var result = new Date(date);
-  result.setDate(result.getDate() + days);
+  result.setDate(date.getDate() + days);
   return result;
 }
 
