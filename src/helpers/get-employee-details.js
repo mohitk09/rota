@@ -23,7 +23,8 @@ async function UnavailableForMostOfTheWeek(members) {
         (todayDate.getMonth() + 1) +
         "-" +
         todayDate.getDate();
-      const endDateOfTheWeek = addDays(todayDate, 3);
+      // This function runs on Monday only and picks friday as this is the end date of the week
+      const endDateOfTheWeek = addDays(todayDate, 4);
       const formattedEndDateOfTheWeek =
         endDateOfTheWeek.getFullYear() +
         "-" +
@@ -109,6 +110,9 @@ async function callBambooApi() {
   }
 }
 
+/* 
+Calls bamboo API and returns all the members of a particular team who are absent today
+*/
 async function absentToday(members) {
   try {
     const response = await callBambooApi();
@@ -143,16 +147,6 @@ async function absentToday(members) {
     throw error;
   }
 }
-const members = [
-  "Lauren Rodgers",
-  "Michael Harrison",
-  "Syed",
-  "Michael Pearce",
-  "Adam Waterhouse",
-  "Deepak Rathee",
-  "Chris Newton",
-  "Mohit Khotani"
-];
 
 function addDays(date, days) {
   var result = new Date(date);
@@ -160,5 +154,4 @@ function addDays(date, days) {
   return result;
 }
 
-UnavailableForMostOfTheWeek(members);
 module.exports = { absentToday, UnavailableForMostOfTheWeek };

@@ -2,12 +2,16 @@ const AWS = require("aws-sdk");
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 const { sendSlackNotifications } = require("../helpers/notify-slack");
-const { getEmployeeDetails } = require("../helpers/get-employee-details");
+const {
+  absentToday,
+  UnavailableForMostOfTheWeek
+} = require("../helpers/get-employee-details");
+
+let message = "Engineer for today is";
 
 const pickMember = async event => {
   const { stage } = process.env;
   const { teamName, source, name } = event;
-  let peopleUnavailable = [];
   try {
     const params = {
       TableName: `ais-${stage}-rota`,
@@ -57,9 +61,12 @@ const pickMember = async event => {
     const memberNames = members.map(item => item.name);
 
     let absentiesList = [];
-    if (source) absentiesList = await getEmployeeDetails(memberNames);
+    let updatedDays = daysElapsed;
 
-    console.log("memmbes", members);
+    // gets called only when lambda is triggered from the slack
+    if (!source) absentiesList = await absentToday(memberNames);
+    // Called every Monday from cloudwatch event rule
+    else absentiesList = await UnavailableForMostOfTheWeek(memberNames);
 
     //check availability of member here and also decrement the count of the selected member
     let personSelected = members[0].name;
@@ -67,46 +74,44 @@ const pickMember = async event => {
     for (let i = 0; i < members.length; i++) {
       if (
         !absentiesList.includes(members[i].name) &&
-        !peopleUnavailable.includes(members[i].name)
+        name !== members[i].name
       ) {
         personSelected = members[i].name;
         personCredits = members[i].credits;
+        members[i].previous = members[i].current;
+        members[i].current = new Date().valueOf();
+        members[i].credits += 1;
+        // if triggered by cloudwatch event rule total credits would be 5
+        if (source) {
+          updatedDays += 5;
+          members[i].credits += 4;
+          message = "Engineer for this week is";
+        }
         break;
       }
     }
 
-    members.forEach(item => {
-      if (item.name === personSelected) {
-        item.credits += 1;
-        item.previous = item.current;
-        item.current = new Date().valueOf();
-      }
-    });
     const updateParams = {
       ExpressionAttributeNames: {
         "#members": "members",
-        "#daysElapsed": "daysElapsed",
-        "#peopleUnavailable": "peopleUnavailable"
+        "#daysElapsed": "daysElapsed"
       },
       ExpressionAttributeValues: {
         ":members": members,
-        ":daysElapsed": daysElapsed + 1,
-        ":peopleUnavailable": absentiesList
+        ":daysElapsed": updatedDays
       },
       Key: {
         teamName: teamName
       },
       ReturnValues: "ALL_NEW",
       TableName: `ais-${stage}-rota`,
-      UpdateExpression:
-        "SET #members = :members, #daysElapsed = :daysElapsed, #peopleUnavailable = :peopleUnavailable"
+      UpdateExpression: "SET #members = :members, #daysElapsed = :daysElapsed"
     };
 
     await Promise.all([
       dynamodb.update(updateParams).promise(),
-      sendSlackNotifications(personSelected, personCredits)
+      sendSlackNotifications(personSelected, personCredits, message)
     ]);
-    console.log("Engineer for today is", personSelected);
     return null;
   } catch (error) {
     console.log(error);
