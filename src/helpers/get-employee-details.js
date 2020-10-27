@@ -30,7 +30,6 @@ async function UnavailableForMostOfTheWeek(members) {
         (endDateOfTheWeek.getMonth() + 1) +
         "-" +
         endDateOfTheWeek.getDate();
-      console.log(item);
       if (item.start <= formattedEndDateOfTheWeek) {
         if (item.end >= formattedEndDateOfTheWeek) {
           const timeDiffWrtWeek =
@@ -50,8 +49,9 @@ async function UnavailableForMostOfTheWeek(members) {
           if (formattedTodayDate >= item.start) {
             const timeDiffWrtStartDate =
               endDate.getTime() - todayDate.getTime();
-            const dayDiffWrtStartDate =
-              timeDiffWrtStartDate / (1000 * 3600 * 24) + 1;
+            const dayDiffWrtStartDate = Math.floor(
+              timeDiffWrtStartDate / (1000 * 3600 * 24) + 1
+            );
             if (membersUnavailability.has(item.name)) {
               const value = membersUnavailability.get(item.name);
               membersUnavailability.set(item.name, value + dayDiffWrtStartDate);
@@ -60,7 +60,9 @@ async function UnavailableForMostOfTheWeek(members) {
             }
           } else {
             const timeDiffWrtEnd = endDate.getTime() - startDate.getTime();
-            const daysDiffWrtEnd = timeDiffWrtEnd / (1000 * 3600 * 24) + 1;
+            const daysDiffWrtEnd = Math.floor(
+              timeDiffWrtEnd / (1000 * 3600 * 24) + 1
+            );
             if (membersUnavailability.has(item.name)) {
               const value = membersUnavailability.get(item.name);
               membersUnavailability.set(item.name, value + daysDiffWrtEnd);
@@ -72,15 +74,19 @@ async function UnavailableForMostOfTheWeek(members) {
       }
     });
 
+    const peopleOnLeave = [];
     for (let [key, value] of membersUnavailability.entries()) {
-      console.log(key + " = " + value);
+      if (value >= 3) {
+        peopleOnLeave.push(key);
+      }
     }
+    return peopleOnLeave;
   } catch (error) {
     console.error(error);
     throw error;
   }
 }
-
+// Function that calls bamboo API and find out the people who are on leave
 async function callBambooApi() {
   try {
     const { SecretString } = await secretsmanager
