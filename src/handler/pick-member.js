@@ -7,9 +7,8 @@ const {
   UnavailableForMostOfTheWeek
 } = require("../helpers/get-employee-details");
 
-let message = "Engineer for today is";
-
 const pickMember = async event => {
+  let message = "Engineer for today is";
   const { stage } = process.env;
   const { teamName, source, name } = event;
   try {
